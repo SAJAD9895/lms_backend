@@ -1,19 +1,48 @@
+// require('dotenv').config();
+// const { ApolloServer } = require('apollo-server');
+// const { typeDefs } = require('./typeDefs');
+// const { authResolvers } = require('./resolvers/auth');
+// const { courseResolvers } = require('./resolvers/course');
+// const { createContext } = require('./context');
+// const { ApolloServer } = require('apollo-server-express');
+
+// const { merge } = require('lodash');
+
+// const server = new ApolloServer({
+//   typeDefs,
+//   resolvers: merge(authResolvers, courseResolvers),
+//   context: createContext,
+// });
+
+// server.listen().then(({ url }) => {
+//   console.log(`🚀 Server ready at ${url}`);
+// });
+
 require('dotenv').config();
-const { ApolloServer } = require('apollo-server');
+const express = require('express');
+const { ApolloServer } = require('apollo-server-express');
 const { typeDefs } = require('./typeDefs');
 const { authResolvers } = require('./resolvers/auth');
 const { courseResolvers } = require('./resolvers/course');
 const { createContext } = require('./context');
-
 const { merge } = require('lodash');
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers: merge(authResolvers, courseResolvers),
-  context: createContext,
-});
+async function startServer() {
+  const app = express();
 
-server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
-});
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers: merge(authResolvers, courseResolvers),
+    context: createContext,
+  });
 
+  await server.start();
+  server.applyMiddleware({ app });
+
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+  });
+}
+
+startServer();
