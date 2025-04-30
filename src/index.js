@@ -30,11 +30,20 @@ const { merge } = require('lodash');
 async function startServer() {
   const app = express();
 
+  // const server = new ApolloServer({
+  //   typeDefs,
+  //   resolvers: merge(authResolvers, courseResolvers),
+  //   context: createContext,
+  // });
   const server = new ApolloServer({
     typeDefs,
     resolvers: merge(authResolvers, courseResolvers),
     context: createContext,
+    introspection: true, // enable schema introspection (needed for playground)
+    playground: true,    // enable GraphQL Playground UI
+    persistedQueries: false, // optional: remove warning
   });
+  
 
   await server.start();
   server.applyMiddleware({ app });
