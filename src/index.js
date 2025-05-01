@@ -21,11 +21,14 @@
 require('dotenv').config();
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
+const { ApolloServerPluginLandingPageProductionDefault } = require('apollo-server-core');
+
 const { typeDefs } = require('./typeDefs');
 const { authResolvers } = require('./resolvers/auth');
 const { courseResolvers } = require('./resolvers/course');
 const { createContext } = require('./context');
 const { merge } = require('lodash');
+
 
 async function startServer() {
   const app = express();
