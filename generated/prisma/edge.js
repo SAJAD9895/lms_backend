@@ -219,12 +219,11 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "postgresql://postgres:UwfKUthXcTKLnODnmVmfnkPvGxgOTVxt@nozomi.proxy.rlwy.net:30043/railway"
       }
     }
   },
