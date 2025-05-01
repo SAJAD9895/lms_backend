@@ -28,6 +28,7 @@ const { authResolvers } = require('./resolvers/auth');
 const { courseResolvers } = require('./resolvers/course');
 const { createContext } = require('./context');
 const { merge } = require('lodash');
+require('dotenv').config();
 
 
 async function startServer() {
@@ -63,6 +64,8 @@ async function startServer() {
 
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
+    console.log("DB URL:", process.env.DATABASE_URL);
+
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
 }
