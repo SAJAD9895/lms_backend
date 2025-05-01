@@ -35,15 +35,25 @@ async function startServer() {
   //   resolvers: merge(authResolvers, courseResolvers),
   //   context: createContext,
   // });
+  // const server = new ApolloServer({
+  //   typeDefs,
+  //   resolvers: merge(authResolvers, courseResolvers),
+  //   context: createContext,
+  //   introspection: true, // enable schema introspection (needed for playground)
+  //   playground: true,    // enable GraphQL Playground UI
+  //   persistedQueries: false, // optional: remove warning
+  // });
   const server = new ApolloServer({
     typeDefs,
     resolvers: merge(authResolvers, courseResolvers),
     context: createContext,
-    introspection: true, // enable schema introspection (needed for playground)
-    playground: true,    // enable GraphQL Playground UI
-    persistedQueries: false, // optional: remove warning
+    introspection: true,
+    plugins: [
+      ApolloServerPluginLandingPageProductionDefault({
+        embed: true, // 👈 Enables the embedded GraphQL UI
+      }),
+    ],
   });
-  
 
   await server.start();
   server.applyMiddleware({ app });
