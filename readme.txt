@@ -7,3 +7,6 @@ npx prisma db push
 
 //run code
 node src/index.js
+
+
+//skbfkjw
