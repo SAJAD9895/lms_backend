@@ -3,7 +3,9 @@
 
 // const prisma = new PrismaClient();
 // Adjusting the import to use the custom path for the Prisma client
-const { PrismaClient } = require('../generated/prisma'); // <-- This is the correct path
+// const { PrismaClient } = require('../generated/prisma'); // <-- This is the correct path
+const { PrismaClient } = require('@prisma/client');
+
 const jwt = require('jsonwebtoken');
 
 // Instantiate Prisma client
