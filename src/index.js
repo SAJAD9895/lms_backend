@@ -39,7 +39,8 @@ async function startServer() {
       Query,
       Mutation,
     },
-    playground: true,
+    playground: true,  // Enable GraphQL Playground
+    introspection: true, 
   });
 
   // Start Apollo Server
