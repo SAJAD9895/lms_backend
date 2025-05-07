@@ -2,86 +2,73 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+model completed_modules {
+  id           Int       @id @default(autoincrement())
+  user_uid     String?   @db.Uuid
+  module_id    Int?
+  completed_at DateTime? @default(now()) @db.Timestamp(6)
+  modules      modules?  @relation(fields: [module_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users        users?    @relation(fields: [user_uid], references: [uid], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_uid, module_id])
+}
+
 model courses {
-  id            Int           @id @default(autoincrement())
-  title         String?       @db.VarChar(255)
-  description   String?
-  price         Decimal?      @db.Decimal(10, 2)
-  provider_name String?       @db.VarChar(100)
-  thumbnail_url String?
-  preview_url   String?
-  created_by    Int?
-  created_at    DateTime?     @default(now()) @db.Timestamp(6)
-  users         users?        @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  enrollments   enrollments[]
-  modules       modules[]
-  payments      payments[]
+  id                Int           @id @default(autoincrement())
+  title             String?       @db.VarChar(255)
+  description       String?
+  thumbnail         String?
+  price             Decimal?      @db.Decimal(10, 2)
+  instructor        String?       @db.VarChar(100)
+  instructor_role   String?       @db.VarChar(100)
+  instructor_avatar String?
+  duration          String?       @db.VarChar(50)
+  published         DateTime?     @db.Date
+  level             String?       @db.VarChar(100)
+  preview_video     String?
+  enrollments       enrollments[]
+  modules           modules[]
 }
 
 model enrollments {
   id          Int       @id @default(autoincrement())
-  user_id     Int?
+  user_uid    String?   @db.Uuid
   course_id   Int?
   enrolled_at DateTime? @default(now()) @db.Timestamp(6)
-  paid        Boolean?  @default(false)
   courses     courses?  @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users       users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users       users?    @relation(fields: [user_uid], references: [uid], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_uid, course_id])
 }
 
 model modules {
-  id        Int      @id @default(autoincrement())
-  course_id Int?
-  title     String?  @db.VarChar(255)
-  position  Int?
-  courses   courses? @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  videos    videos[]
-}
-
-model payments {
-  id           Int             @id @default(autoincrement())
-  user_id      Int?
-  course_id    Int?
-  amount       Decimal?        @db.Decimal(10, 2)
-  status       payment_status?
-  payment_date DateTime?       @default(now()) @db.Timestamp(6)
-  provider     String?         @db.VarChar(50)
-  courses      courses?        @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users        users?          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                Int                 @id @default(autoincrement())
+  course_id         Int?
+  title             String?             @db.VarChar(255)
+  completed_modules completed_modules[]
+  courses           courses?            @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  videos            videos[]
 }
 
 model users {
-  id          Int           @id @default(autoincrement())
-  uid         String        @unique(map: "users_email_key") @db.VarChar(100)
-  role        user_role?
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  name        String?       @db.VarChar(100)
-  courses     courses[]
-  enrollments enrollments[]
-  payments    payments[]
+  uid               String              @id @db.Text // Explicitly set as Text type
+  phone             String?             @db.VarChar(20)
+  name              String?             @db.VarChar(100)
+  role              String?             @db.VarChar(50)
+  completed_modules completed_modules[]
+  enrollments       enrollments[]
 }
 
 model videos {
-  id        Int      @id @default(autoincrement())
-  module_id Int?
-  title     String?  @db.VarChar(255)
-  video_url String?
-  position  Int?
-  modules   modules? @relation(fields: [module_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-enum payment_status {
-  success
-  failed
-  pending
-}
-
-enum user_role {
-  admin
-  learner
+  id         Int      @id @default(autoincrement())
+  module_id  Int?
+  title      String?  @db.VarChar(255)
+  duration   String?  @db.VarChar(20)
+  is_preview Boolean? @default(false)
+  modules    modules? @relation(fields: [module_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
