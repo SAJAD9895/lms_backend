@@ -39,6 +39,7 @@ async function startServer() {
       Query,
       Mutation,
     },
+    playground: true,
   });
 
   // Start Apollo Server
