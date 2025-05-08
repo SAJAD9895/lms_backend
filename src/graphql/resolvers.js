@@ -11,6 +11,8 @@ module.exports = {
       prisma.enrollment.findMany({ where: { userUid } }),
     getUser: (_, { uid }) =>
       prisma.users.findUnique({ where: { uid } }),
+    getAllUsers: () =>
+      prisma.users.findMany(),
   },
 
   Mutation: {

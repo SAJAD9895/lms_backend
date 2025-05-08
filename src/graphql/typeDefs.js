@@ -44,7 +44,6 @@ const typeDefs = gql`
   }
 
   type User {
-    id: Int!
     uid: String!
     name: String!
     phone: String
@@ -88,6 +87,7 @@ const typeDefs = gql`
     getCourse(id: Int!): Course
     getUserEnrollments(userUid: String!): [Enrollment!]!
     getUser(uid: String!): User
+    getAllUsers: [User!]!   # ✅ Added this line
   }
 
   type Mutation {
