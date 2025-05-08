@@ -45,7 +45,7 @@ const typeDefs = gql`
 
   type User {
     id: Int!
-    uid: String!  # Firebase UID
+    uid: String!
     name: String!
     phone: String
     role: String
@@ -56,20 +56,6 @@ const typeDefs = gql`
     name: String!
     phone: String
     role: String
-  }
-
-  type Query {
-    getCourses: [Course!]!
-    getCourse(id: Int!): Course
-    getUserEnrollments(userUid: String!): [Enrollment!]!
-    getUser(uid: String!): User
-  }
-
-  type Mutation {
-    addCourse(data: AddCourseInput!): Course!
-    enrollUser(userUid: String!, courseId: Int!): Enrollment!
-    completeModule(userUid: String!, moduleId: Int!): CompletedModule!
-    addUser(uid: String!, name: String!, phone: String, role: String): User!  # Adjusted mutation
   }
 
   input AddCourseInput {
@@ -96,6 +82,20 @@ const typeDefs = gql`
     duration: String!
     isPreview: Boolean!
   }
+
+  type Query {
+    getCourses: [Course!]!
+    getCourse(id: Int!): Course
+    getUserEnrollments(userUid: String!): [Enrollment!]!
+    getUser(uid: String!): User
+  }
+
+  type Mutation {
+    addCourse(data: AddCourseInput!): Course!
+    enrollUser(userUid: String!, courseId: Int!): Enrollment!
+    completeModule(userUid: String!, moduleId: Int!): CompletedModule!
+    addUser(uid: String!, name: String!, phone: String, role: String): User!
+  }
 `;
 
-module.exports = { typeDefs };
+module.exports = typeDefs;
