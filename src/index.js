@@ -5,21 +5,24 @@ const resolvers = require('./graphql/resolvers');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*', // or explicitly allow your domain
+  credentials: true
+}));
 
 async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    playground: true,
+    // playground: true,
     introspection: true, // allows schema introspection
-    plugins: [
-      require('apollo-server-core').ApolloServerPluginLandingPageGraphQLPlayground({
-        settings: {
-          'request.credentials': 'include',
-        },
-      }),
-    ],
+    // plugins: [
+    //   require('apollo-server-core').ApolloServerPluginLandingPageGraphQLPlayground({
+    //     settings: {
+    //       'request.credentials': 'include',
+    //     },
+    //   }),
+    // ],
   });
 
   await server.start(); // Required for Apollo Server v3+
