@@ -12,7 +12,14 @@ async function startServer() {
     typeDefs,
     resolvers,
     playground: true,
-    introspection: true,
+    introspection: true, // allows schema introspection
+    plugins: [
+      require('apollo-server-core').ApolloServerPluginLandingPageGraphQLPlayground({
+        settings: {
+          'request.credentials': 'include',
+        },
+      }),
+    ],
   });
 
   await server.start(); // Required for Apollo Server v3+
