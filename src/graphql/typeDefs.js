@@ -6,6 +6,7 @@ const typeDefs = gql`
     title: String!
     duration: String!
     isPreview: Boolean  # Change this to make it nullable
+    link: String
   }
 
   type Module {
@@ -81,6 +82,7 @@ const typeDefs = gql`
     title: String!
     duration: String!
     isPreview: Boolean  # Change this to make it nullable
+    link: String
   }
 
   type Query {

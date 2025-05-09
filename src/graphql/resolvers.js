@@ -42,6 +42,7 @@ module.exports = {
                   title: video.title,
                   duration: video.duration,
                   is_preview: video.isPreview,
+                  link: video.link, // ✅ Add the link field here
                 })),
               },
             })),
@@ -56,6 +57,40 @@ module.exports = {
         },
       });
     },
+    
+    // addCourse: async (_, { data }) => {
+    //   const { modules, instructorRole, instructorAvatar, previewVideo, ...courseData } = data;
+    
+    //   return await prisma.courses.create({
+    //     data: {
+    //       ...courseData,
+    //       instructor_role: instructorRole,
+    //       instructor_avatar: instructorAvatar,
+    //       preview_video: previewVideo,
+    //       published: new Date(data.published),
+    //       modules: {
+    //         create: modules.map((module) => ({
+    //           title: module.title,
+    //           videos: {
+    //             create: module.videos.map((video) => ({
+    //               title: video.title,
+    //               duration: video.duration,
+    //               is_preview: video.isPreview,
+    //               link: video.link, 
+    //             })),
+    //           },
+    //         })),
+    //       },
+    //     },
+    //     include: {
+    //       modules: {
+    //         include: {
+    //           videos: true,
+    //         },
+    //       },
+    //     },
+    //   });
+    // },
     
     
     
