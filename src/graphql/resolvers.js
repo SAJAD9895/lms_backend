@@ -4,7 +4,15 @@ const prisma = new PrismaClient();
 module.exports = {
   Query: {
     getCourses: () =>
-      prisma.course.findMany({ include: { modules: { include: { videos: true } } } }),
+      prisma.courses.findMany({
+        include: {
+          modules: {
+            include: { videos: true },
+          },
+        },
+      }),
+    
+    
     getCourse: (_, { id }) =>
       prisma.course.findUnique({ where: { id }, include: { modules: { include: { videos: true } } } }),
     getUserEnrollments: (_, { userUid }) =>
@@ -17,23 +25,82 @@ module.exports = {
 
   Mutation: {
     addCourse: async (_, { data }) => {
-      const { modules, ...courseData } = data;
-      return await prisma.course.create({
+      const { modules, instructorRole, instructorAvatar, previewVideo, ...courseData } = data;
+    
+      return await prisma.courses.create({
         data: {
           ...courseData,
-          published: new Date(courseData.published),
+          instructor_role: instructorRole,
+          instructor_avatar: instructorAvatar,
+          preview_video: previewVideo,
+          published: new Date(data.published),
           modules: {
-            create: modules.map((mod) => ({
-              title: mod.title,
+            create: modules.map((module) => ({
+              title: module.title,
               videos: {
-                create: mod.videos,
+                create: module.videos.map((video) => ({
+                  title: video.title,
+                  duration: video.duration,
+                  is_preview: video.isPreview,
+                })),
               },
             })),
           },
         },
-        include: { modules: { include: { videos: true } } },
+        include: {
+          modules: {
+            include: {
+              videos: true,
+            },
+          },
+        },
       });
     },
+    
+    
+    
+    // addCourse: async (_, { data }) => {
+    //   return await prisma.courses.create({
+    //     data: {
+    //       ...courseData,
+    //       instructor_role: instructorRole,
+    //       instructor_avatar: instructorAvatar,
+    //       published: new Date(courseData.published),
+    //       modules: {
+    //         create: modules.map((mod) => ({
+    //           title: mod.title,
+    //           videos: {
+    //             create: mod.videos,
+    //           },
+    //         })),
+    //       },
+    //     },
+    //     include: {
+    //       modules: {
+    //         include: {
+    //           videos: true,
+    //         },
+    //       },
+    //     },
+    //   });
+      
+      
+    //   // return await prisma.course.create({
+    //   //   data: {
+    //   //     ...courseData,
+    //   //     published: new Date(courseData.published),
+    //   //     modules: {
+    //   //       create: modules.map((mod) => ({
+    //   //         title: mod.title,
+    //   //         videos: {
+    //   //           create: mod.videos,
+    //   //         },
+    //   //       })),
+    //   //     },
+    //   //   },
+    //   //   include: { modules: { include: { videos: true } } },
+    //   // });
+    // },
 
     enrollUser: (_, { userUid, courseId }) =>
       prisma.enrollment.create({ data: { userUid, courseId } }),
