@@ -5,7 +5,7 @@ const typeDefs = gql`
     id: Int!
     title: String!
     duration: String!
-    isPreview: Boolean  # Change this to make it nullable
+    isPreview: Boolean
     link: String
   }
 
@@ -27,6 +27,7 @@ const typeDefs = gql`
     duration: String!
     published: String!
     level: String!
+    previewVideo: String
     modules: [Module!]!
   }
 
@@ -81,8 +82,30 @@ const typeDefs = gql`
   input AddVideoInput {
     title: String!
     duration: String!
-    isPreview: Boolean  # Change this to make it nullable
+    isPreview: Boolean
     link: String
+  }
+
+  input UpdateCourseInput {
+    title: String
+    description: String
+    thumbnail: String
+    price: Float
+    instructor: String
+    instructorRole: String
+    instructorAvatar: String
+    duration: String
+    published: String
+    level: String
+    previewVideo: String
+    modules: [AddModuleInput!]!  
+  }
+
+
+  input UpdateUserInput {
+    name: String
+    phone: String
+    role: String
   }
 
   type Query {
@@ -95,6 +118,8 @@ const typeDefs = gql`
 
   type Mutation {
     addCourse(data: AddCourseInput!): Course!
+    updateCourse(id: Int!, data: UpdateCourseInput!): Course!
+    updateUser(uid: String!, data: UpdateUserInput!): User!
     enrollUser(userUid: String!, courseId: Int!): Enrollment!
     completeModule(userUid: String!, moduleId: Int!): CompletedModule!
     addUser(uid: String!, name: String!, phone: String, role: String): User!
