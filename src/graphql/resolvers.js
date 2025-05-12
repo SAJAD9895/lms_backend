@@ -71,30 +71,66 @@ module.exports = {
         },
       });
     },
+updateCourse: async (_, { id, data }) => {
+  try {
+    const updatedCourse = await prisma.courses.update({
+      where: { id },
+      data: {
+        title: data.title,
+        description: data.description,
+        thumbnail: data.thumbnail,
+        price: data.price,
+        instructor: data.instructor,
+        instructor_role: data.instructorRole,
+        instructor_avatar: data.instructorAvatar,
+        duration: data.duration,
+        published: data.published ? new Date(data.published) : undefined,
+        level: data.level,
+        preview_video: data.previewVideo,
+        // Don't pass modules here unless you're handling nested updates correctly
+      },
+      include: {
+        modules: {
+          include: { videos: true },
+        },
+      },
+    });
 
-    updateCourse: async (_, { id, data }) => {
-      try {
-        const updatedCourse = await prisma.courses.update({
-          where: { id },
-          data: {
-            ...data,
-            instructor_role: data.instructorRole,
-            instructor_avatar: data.instructorAvatar,
-            preview_video: data.previewVideo,
-            published: data.published ? new Date(data.published) : undefined,
-          },
-          include: {
-            modules: {
-              include: { videos: true },
-            },
-          },
-        });
-        return updatedCourse;
-      } catch (error) {
-        console.error("Error updating course:", error);
-        throw new Error("Failed to update course");
-      }
-    },
+    return updatedCourse;
+  } catch (error) {
+    console.error("Error updating course:", error);
+    throw new Error(error.message || "Failed to update course");
+  }
+}
+,
+    // updateCourse: async (_, { id, data }) => {
+    //   try {
+    //     const updatedCourse = await prisma.courses.update({
+    //       where: { id },
+    //       data: {
+    //         ...data,
+    //         instructor_role: data.instructorRole,
+    //         instructor_avatar: data.instructorAvatar,
+    //         preview_video: data.previewVideo,
+    //         published: data.published ? new Date(data.published) : undefined,
+    //       },
+    //       include: {
+    //         modules: {
+    //           include: { videos: true },
+    //         },
+    //       },
+    //     });
+    //     return updatedCourse;
+    //   } catch (error) {
+    //     console.log("Update ID:", id);
+    //     console.log("Update Data:", data);
+    //     console.log("Error Message:", error.message);
+    //     console.log("Error Stack:", error.stack);
+
+    //     console.error("Error updating course:", error);
+    //     throw new Error("Failed to update course");
+    //   }
+    // },
 
     enrollUser: (_, { userUid, courseId }) =>
       prisma.enrollment.create({ data: { userUid, courseId } }),
