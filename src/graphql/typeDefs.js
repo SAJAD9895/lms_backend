@@ -33,10 +33,13 @@ const typeDefs = gql`
 
   type Enrollment {
     id: Int!
-    userUid: String!
-    courseId: Int!
-    course: Course!
+    userUid: String    
+    courseId: Int      
+    enrolledAt: String
+    user: User
+    course: Course
   }
+
 
   type CompletedModule {
     id: Int!
@@ -60,18 +63,18 @@ const typeDefs = gql`
   }
 
   input AddCourseInput {
-    title: String!
-    description: String!
-    thumbnail: String
-    price: Float!
-    instructor: String!
-    instructorRole: String!
-    instructorAvatar: String!
-    duration: String!
-    published: String!
-    level: String!
-    previewVideo: String
-    modules: [AddModuleInput!]!
+      title: String!
+      description: String!
+      thumbnail: String
+      price: Float!
+      instructor: String!
+      instructorRole: String!
+      instructorAvatar: String!
+      duration: String!
+      published: String!
+      level: String!
+      previewVideo: String
+      modules: [AddModuleInput!]!
   }
 
   input AddModuleInput {
@@ -98,9 +101,20 @@ const typeDefs = gql`
     published: String
     level: String
     previewVideo: String
-    modules: [AddModuleInput!]!  
-  }
-
+    modules: [UpdateModuleInput!]
+ }
+input UpdateModuleInput {
+  id: Int
+  title: String!
+  videos: [UpdateVideoInput!]!
+}
+input UpdateVideoInput {
+  id: Int
+  title: String!
+  duration: String!
+  isPreview: Boolean
+  link: String
+}
 
   input UpdateUserInput {
     name: String
@@ -112,17 +126,19 @@ const typeDefs = gql`
     getCourses: [Course!]!
     getCourse(id: Int!): Course
     getUserEnrollments(userUid: String!): [Enrollment!]!
+    getAllEnrolledUsers: [Enrollment!]!
     getUser(uid: String!): User
     getAllUsers: [User!]!
   }
 
   type Mutation {
     addCourse(data: AddCourseInput!): Course!
-    updateCourse(id: Int!, data: UpdateCourseInput!): Course!
+    updateCourse(id: Int!, data: UpdateCourseInput!): Course
     updateUser(uid: String!, data: UpdateUserInput!): User!
     enrollUser(userUid: String!, courseId: Int!): Enrollment!
     completeModule(userUid: String!, moduleId: Int!): CompletedModule!
     addUser(uid: String!, name: String!, phone: String, role: String): User!
+    addEnroll(userUid: String!, courseId: Int!): Enrollment!
   }
 `;
 

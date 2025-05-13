@@ -29,6 +29,30 @@ module.exports = {
       prisma.users.findUnique({ where: { uid } }),
 
     getAllUsers: () => prisma.users.findMany(),
+
+  getAllEnrolledUsers: async () => {
+  try {
+    const enrollments = await prisma.enrollments.findMany({
+      include: {
+        users: true,
+        courses: true,
+      },
+    });
+
+    return enrollments.map((enrollment) => ({
+      id: enrollment.id,
+      userUid: enrollment.user_uid,
+      courseId: enrollment.course_id,
+      enrolledAt: enrollment.enrolled_at?.toISOString() ?? null,
+      user: enrollment.users,
+      course: enrollment.courses,
+    }));
+  } catch (error) {
+    console.error('Error fetching enrolled users:', error);
+    throw new Error('Failed to fetch enrolled users');
+  }
+}
+
   },
 
   Mutation: {
@@ -71,7 +95,7 @@ module.exports = {
         },
       });
     },
-updateCourse: async (_, { id, data }) => {
+    updateCourse: async (_, { id, data }) => {
   try {
     const updatedCourse = await prisma.courses.update({
       where: { id },
@@ -87,7 +111,6 @@ updateCourse: async (_, { id, data }) => {
         published: data.published ? new Date(data.published) : undefined,
         level: data.level,
         preview_video: data.previewVideo,
-        // Don't pass modules here unless you're handling nested updates correctly
       },
       include: {
         modules: {
@@ -96,13 +119,23 @@ updateCourse: async (_, { id, data }) => {
       },
     });
 
-    return updatedCourse;
+    // Optional debug log
+    console.log("Updated Course Input:", data);
+    console.log("Updated Course DB Record:", updatedCourse);
+
+    // Map snake_case fields to camelCase for GraphQL response
+    return {
+      ...updatedCourse,
+      instructorRole: updatedCourse.instructor_role,
+      instructorAvatar: updatedCourse.instructor_avatar,
+      previewVideo: updatedCourse.preview_video,
+    };
   } catch (error) {
     console.error("Error updating course:", error);
     throw new Error(error.message || "Failed to update course");
   }
-}
-,
+},
+
     // updateCourse: async (_, { id, data }) => {
     //   try {
     //     const updatedCourse = await prisma.courses.update({
@@ -182,5 +215,35 @@ updateCourse: async (_, { id, data }) => {
         throw new Error("Failed to update user");
       }
     },
+    addEnroll: async (_, { userUid, courseId }) => {
+      try {
+        const enrollment = await prisma.enrollments.create({
+          data: {
+            user_uid: userUid,
+            course_id: courseId,
+          },
+          include: {
+            users: true,
+            courses: true,
+          },
+        });
+
+        return {
+          id: enrollment.id,
+          userUid: enrollment.user_uid,
+          courseId: enrollment.course_id,
+          enrolledAt: enrollment.enrolled_at.toISOString(),
+          user: enrollment.users,
+          course: enrollment.courses,
+        };
+      } catch (error) {
+        if (error.code === 'P2002') {
+          throw new Error('User is already enrolled in this course.');
+        }
+        console.error("Error in addEnroll:", error);
+        throw new Error('Failed to enroll user.');
+      }
+    },
+
   },
 };
