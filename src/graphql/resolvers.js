@@ -3,14 +3,23 @@ const prisma = new PrismaClient();
 
 module.exports = {
   Query: {
-    getCourses: () =>
-      prisma.courses.findMany({
-        include: {
-          modules: {
-            include: { videos: true },
-          },
-        },
-      }),
+ getCourses: async () => {
+  const courses = await prisma.courses.findMany({
+    include: {
+      modules: {
+        include: { videos: true },
+      },
+    },
+  });
+
+  return courses.map(course => ({
+    ...course,
+    instructorRole: course.instructor_role,
+    instructorAvatar: course.instructor_avatar,
+    previewVideo: course.preview_video,
+  }));
+}
+,
 
     getCourse: (_, { id }) =>
       prisma.courses.findUnique({
