@@ -19,7 +19,6 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-      cache: new InMemoryLRUCache(),
     introspection: true, // allows schema introspection
     plugins: [
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
