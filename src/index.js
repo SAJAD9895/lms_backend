@@ -1,31 +1,27 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
+const typeDefs = require('./graphql/typeDefs');
+const resolvers = require('./graphql/resolvers');
 const cors = require('cors');
 const { ApolloServerPluginLandingPageLocalDefault } = require('apollo-server-core');
 
-const typeDefs = require('./graphql/typeDefs');
-const resolvers = require('./graphql/resolvers');
-const { createContext } = require('./context'); // your context file that returns { prisma, userId }
-
 const app = express();
-
 app.use(cors({
-  origin: '*', // adjust for your production domains
-  credentials: true,
+  origin: '*', // or explicitly allow your domain
+  credentials: true
 }));
 
 async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: createContext, // Pass context function here
-    introspection: true,
+    introspection: true, // allows schema introspection
     plugins: [
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
   });
 
-  await server.start();
+  await server.start(); // Required for Apollo Server v3+
   server.applyMiddleware({ app, path: '/graphql' });
 
   const PORT = process.env.PORT || 4000;
