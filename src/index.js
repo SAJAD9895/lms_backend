@@ -5,6 +5,10 @@ const resolvers = require('./graphql/resolvers');
 const cors = require('cors');
 const { ApolloServerPluginLandingPageLocalDefault } = require('apollo-server-core');
 
+
+
+
+
 const app = express();
 app.use(cors({
   origin: '*', // or explicitly allow your domain
