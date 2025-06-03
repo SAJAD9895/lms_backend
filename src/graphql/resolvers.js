@@ -18,8 +18,7 @@ module.exports = {
     instructorAvatar: course.instructor_avatar,
     previewVideo: course.preview_video,
   }));
-}
-,
+},
 
     getCourse: (_, { id }) =>
       prisma.courses.findUnique({
@@ -145,73 +144,46 @@ module.exports = {
   }
 },
 
-    // updateCourse: async (_, { id, data }) => {
-    //   try {
-    //     const updatedCourse = await prisma.courses.update({
-    //       where: { id },
-    //       data: {
-    //         ...data,
-    //         instructor_role: data.instructorRole,
-    //         instructor_avatar: data.instructorAvatar,
-    //         preview_video: data.previewVideo,
-    //         published: data.published ? new Date(data.published) : undefined,
-    //       },
-    //       include: {
-    //         modules: {
-    //           include: { videos: true },
-    //         },
-    //       },
-    //     });
-    //     return updatedCourse;
-    //   } catch (error) {
-    //     console.log("Update ID:", id);
-    //     console.log("Update Data:", data);
-    //     console.log("Error Message:", error.message);
-    //     console.log("Error Stack:", error.stack);
-
-    //     console.error("Error updating course:", error);
-    //     throw new Error("Failed to update course");
-    //   }
-    // },
-
     enrollUser: (_, { userUid, courseId }) =>
       prisma.enrollment.create({ data: { userUid, courseId } }),
 
     completeModule: (_, { userUid, moduleId }) =>
       prisma.completedModule.create({ data: { userUid, moduleId } }),
 
-    addUser: async (_, { uid, name, phone, role }) => {
-      try {
-        console.log("Adding user with UID:", uid);
+addUser: async (_, { uid, name, phone, role }) => {
+  try {
+    console.log("Adding user with UID:", uid);
 
-        if (!uid || typeof uid !== 'string') {
-          throw new Error('UID must be a valid non-empty string');
-        }
+    if (!uid || typeof uid !== 'string') {
+      throw new Error('UID must be a valid non-empty string');
+    }
 
-        try {
-          const newUser = await prisma.users.create({
-            data: {
-              uid,
-              name: name || "",
-              phone,
-              role,
-            },
-          });
+    try {
+      const newUser = await prisma.users.create({
+        data: {
+          uid,
+          name: name || "",
+          phone,
+          role,
+          mobile: false,  // Default value
+          pc: false       // Default value
+        },
+      });
 
-          console.log("User created:", newUser);
-          return newUser;
-        } catch (createError) {
-          if (createError.message.includes('Unique constraint')) {
-            throw new Error(`User with UID ${uid} already exists.`);
-          }
-          throw createError;
-        }
-      } catch (error) {
-        console.error("Detailed error:", error);
-        throw new Error("Error creating user: " + error.message);
+      console.log("User created:", newUser);
+      return newUser;
+    } catch (createError) {
+      if (createError.message.includes('Unique constraint')) {
+        throw new Error(`User with UID ${uid} already exists.`);
       }
-    },
-
+      throw createError;
+    }
+  } catch (error) {
+    console.error("Detailed error:", error);
+    throw new Error("Error creating user: " + error.message);
+  }
+}
+,
     updateUser: async (_, { uid, data }) => {
       try {
         const updatedUser = await prisma.users.update({

@@ -60,9 +60,14 @@ model users {
   phone             String?             @db.VarChar(20)
   name              String?             @db.VarChar(100)
   role              String?             @db.VarChar(50)
+  mobile            Boolean?            @default(false)
+  pc                Boolean?            @default(false)
+  mobile_address    String?             @db.VarChar(255)
+  pc_address        String?             @db.VarChar(255)
   completed_modules completed_modules[]
   enrollments       enrollments[]
 }
+
 
 model videos {
   id         Int      @id @default(autoincrement())

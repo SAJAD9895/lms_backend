@@ -22,12 +22,12 @@ const typeDefs = gql`
     thumbnail: String
     price: Float!
     instructor: String!
-    instructorRole: String
-    instructorAvatar: String
+    instructor_role: String
+    instructor_avatar: String
     duration: String!
     published: String!
     level: String!
-    previewVideo: String
+    preview_video: String
     modules: [Module!]!
   }
 
@@ -53,6 +53,8 @@ const typeDefs = gql`
     name: String!
     phone: String
     role: String
+    mobile: Boolean
+    pc: Boolean
   }
 
   input AddUserInput {
