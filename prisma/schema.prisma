@@ -68,7 +68,6 @@ model users {
   enrollments       enrollments[]
 }
 
-
 model videos {
   id         Int      @id @default(autoincrement())
   module_id  Int?
