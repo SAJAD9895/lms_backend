@@ -1,7 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
-
-const prisma = new PrismaClient();
+const prisma = require('./prisma/client'); // ← import singleton Prisma
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 const createContext = ({ req }) => {
