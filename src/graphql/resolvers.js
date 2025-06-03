@@ -1,26 +1,29 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+// Remove the PrismaClient import and instance creation
+// const { PrismaClient } = require('@prisma/client');
+// const prisma = new PrismaClient();
 
 module.exports = {
   Query: {
- getCourses: async () => {
-  const courses = await prisma.courses.findMany({
-    include: {
-      modules: {
-        include: { videos: true },
-      },
+    getCourses: async (_, args, { prisma }) => {
+      const courses = await prisma.courses.findMany({
+        include: {
+          modules: {
+            include: { videos: true },
+          },
+        },
+      });
+
+      return courses.map(course => ({
+        ...course,
+        instructorRole: course.instructor_role,
+        instructorAvatar: course.instructor_avatar,
+        previewVideo: course.preview_video,
+      }));
     },
-  });
 
-  return courses.map(course => ({
-    ...course,
-    instructorRole: course.instructor_role,
-    instructorAvatar: course.instructor_avatar,
-    previewVideo: course.preview_video,
-  }));
-},
-
-    getCourse: (_, { id }) =>
+    getCourse: (_, { id }, { prisma }) =>
       prisma.courses.findUnique({
         where: { id },
         include: {
@@ -30,41 +33,40 @@ module.exports = {
         },
       }),
 
-    getUserEnrollments: (_, { userUid }) =>
+    getUserEnrollments: (_, { userUid }, { prisma }) =>
       prisma.enrollment.findMany({ where: { userUid } }),
 
-    getUser: (_, { uid }) =>
+    getUser: (_, { uid }, { prisma }) =>
       prisma.users.findUnique({ where: { uid } }),
 
-    getAllUsers: () => prisma.users.findMany(),
+    getAllUsers: (_, args, { prisma }) => prisma.users.findMany(),
 
-  getAllEnrolledUsers: async () => {
-  try {
-    const enrollments = await prisma.enrollments.findMany({
-      include: {
-        users: true,
-        courses: true,
-      },
-    });
+    getAllEnrolledUsers: async (_, args, { prisma }) => {
+      try {
+        const enrollments = await prisma.enrollments.findMany({
+          include: {
+            users: true,
+            courses: true,
+          },
+        });
 
-    return enrollments.map((enrollment) => ({
-      id: enrollment.id,
-      userUid: enrollment.user_uid,
-      courseId: enrollment.course_id,
-      enrolledAt: enrollment.enrolled_at?.toISOString() ?? null,
-      user: enrollment.users,
-      course: enrollment.courses,
-    }));
-  } catch (error) {
-    console.error('Error fetching enrolled users:', error);
-    throw new Error('Failed to fetch enrolled users');
-  }
-}
-
+        return enrollments.map((enrollment) => ({
+          id: enrollment.id,
+          userUid: enrollment.user_uid,
+          courseId: enrollment.course_id,
+          enrolledAt: enrollment.enrolled_at?.toISOString() ?? null,
+          user: enrollment.users,
+          course: enrollment.courses,
+        }));
+      } catch (error) {
+        console.error('Error fetching enrolled users:', error);
+        throw new Error('Failed to fetch enrolled users');
+      }
+    }
   },
 
   Mutation: {
-    addCourse: async (_, { data }) => {
+    addCourse: async (_, { data }, { prisma }) => {
       const {
         modules,
         instructorRole,
@@ -103,88 +105,89 @@ module.exports = {
         },
       });
     },
-    updateCourse: async (_, { id, data }) => {
-  try {
-    const updatedCourse = await prisma.courses.update({
-      where: { id },
-      data: {
-        title: data.title,
-        description: data.description,
-        thumbnail: data.thumbnail,
-        price: data.price,
-        instructor: data.instructor,
-        instructor_role: data.instructorRole,
-        instructor_avatar: data.instructorAvatar,
-        duration: data.duration,
-        published: data.published ? new Date(data.published) : undefined,
-        level: data.level,
-        preview_video: data.previewVideo,
-      },
-      include: {
-        modules: {
-          include: { videos: true },
-        },
-      },
-    });
 
-    // Optional debug log
-    console.log("Updated Course Input:", data);
-    console.log("Updated Course DB Record:", updatedCourse);
+    updateCourse: async (_, { id, data }, { prisma }) => {
+      try {
+        const updatedCourse = await prisma.courses.update({
+          where: { id },
+          data: {
+            title: data.title,
+            description: data.description,
+            thumbnail: data.thumbnail,
+            price: data.price,
+            instructor: data.instructor,
+            instructor_role: data.instructorRole,
+            instructor_avatar: data.instructorAvatar,
+            duration: data.duration,
+            published: data.published ? new Date(data.published) : undefined,
+            level: data.level,
+            preview_video: data.previewVideo,
+          },
+          include: {
+            modules: {
+              include: { videos: true },
+            },
+          },
+        });
 
-    // Map snake_case fields to camelCase for GraphQL response
-    return {
-      ...updatedCourse,
-      instructorRole: updatedCourse.instructor_role,
-      instructorAvatar: updatedCourse.instructor_avatar,
-      previewVideo: updatedCourse.preview_video,
-    };
-  } catch (error) {
-    console.error("Error updating course:", error);
-    throw new Error(error.message || "Failed to update course");
-  }
-},
+        // Optional debug log
+        console.log("Updated Course Input:", data);
+        console.log("Updated Course DB Record:", updatedCourse);
 
-    enrollUser: (_, { userUid, courseId }) =>
+        // Map snake_case fields to camelCase for GraphQL response
+        return {
+          ...updatedCourse,
+          instructorRole: updatedCourse.instructor_role,
+          instructorAvatar: updatedCourse.instructor_avatar,
+          previewVideo: updatedCourse.preview_video,
+        };
+      } catch (error) {
+        console.error("Error updating course:", error);
+        throw new Error(error.message || "Failed to update course");
+      }
+    },
+
+    enrollUser: (_, { userUid, courseId }, { prisma }) =>
       prisma.enrollment.create({ data: { userUid, courseId } }),
 
-    completeModule: (_, { userUid, moduleId }) =>
+    completeModule: (_, { userUid, moduleId }, { prisma }) =>
       prisma.completedModule.create({ data: { userUid, moduleId } }),
 
-addUser: async (_, { uid, name, phone, role }) => {
-  try {
-    console.log("Adding user with UID:", uid);
+    addUser: async (_, { uid, name, phone, role }, { prisma }) => {
+      try {
+        console.log("Adding user with UID:", uid);
 
-    if (!uid || typeof uid !== 'string') {
-      throw new Error('UID must be a valid non-empty string');
-    }
+        if (!uid || typeof uid !== 'string') {
+          throw new Error('UID must be a valid non-empty string');
+        }
 
-    try {
-      const newUser = await prisma.users.create({
-        data: {
-          uid,
-          name: name || "",
-          phone,
-          role,
-          mobile: false,  // Default value
-          pc: false       // Default value
-        },
-      });
+        try {
+          const newUser = await prisma.users.create({
+            data: {
+              uid,
+              name: name || "",
+              phone,
+              role,
+              mobile: false,  // Default value
+              pc: false       // Default value
+            },
+          });
 
-      console.log("User created:", newUser);
-      return newUser;
-    } catch (createError) {
-      if (createError.message.includes('Unique constraint')) {
-        throw new Error(`User with UID ${uid} already exists.`);
+          console.log("User created:", newUser);
+          return newUser;
+        } catch (createError) {
+          if (createError.message.includes('Unique constraint')) {
+            throw new Error(`User with UID ${uid} already exists.`);
+          }
+          throw createError;
+        }
+      } catch (error) {
+        console.error("Detailed error:", error);
+        throw new Error("Error creating user: " + error.message);
       }
-      throw createError;
-    }
-  } catch (error) {
-    console.error("Detailed error:", error);
-    throw new Error("Error creating user: " + error.message);
-  }
-}
-,
-    updateUser: async (_, { uid, data }) => {
+    },
+
+    updateUser: async (_, { uid, data }, { prisma }) => {
       try {
         const updatedUser = await prisma.users.update({
           where: { uid },
@@ -196,7 +199,8 @@ addUser: async (_, { uid, name, phone, role }) => {
         throw new Error("Failed to update user");
       }
     },
-    addEnroll: async (_, { userUid, courseId }) => {
+
+    addEnroll: async (_, { userUid, courseId }, { prisma }) => {
       try {
         const enrollment = await prisma.enrollments.create({
           data: {
@@ -225,6 +229,5 @@ addUser: async (_, { uid, name, phone, role }) => {
         throw new Error('Failed to enroll user.');
       }
     },
-
   },
 };

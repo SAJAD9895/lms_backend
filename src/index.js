@@ -4,6 +4,7 @@ const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
 const cors = require('cors');
 const { ApolloServerPluginLandingPageLocalDefault } = require('apollo-server-core');
+const prisma = require('./prisma'); // Import the singleton
 
 const app = express();
 app.use(cors({
@@ -15,6 +16,9 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => ({
+      prisma, // Add prisma to context
+    }),
     persistedQueries: false,
     introspection: true, // allows schema introspection
     plugins: [
@@ -30,5 +34,18 @@ async function startServer() {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
 }
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down gracefully...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Shutting down gracefully...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
 
 startServer();
