@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "videos" ALTER COLUMN "link" SET DATA TYPE VARCHAR(1000);
