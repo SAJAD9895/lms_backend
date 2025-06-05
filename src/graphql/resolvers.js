@@ -12,6 +12,8 @@ module.exports = {
     },
   });
 
+
+  
   return courses.map(course => ({
     ...course,
     instructorRole: course.instructor_role,
