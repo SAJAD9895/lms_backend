@@ -119,10 +119,15 @@ input UpdateVideoInput {
 }
 
   input UpdateUserInput {
-    name: String
-    phone: String
-    role: String
-  }
+  name: String
+  phone: String
+  role: String
+  mobile: Boolean
+  pc: Boolean
+  mobile_address: String
+  pc_address: String
+}
+
 
   type Query {
     getCourses: [Course!]!
