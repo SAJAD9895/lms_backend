@@ -55,6 +55,9 @@ const typeDefs = gql`
     role: String
     mobile: Boolean
     pc: Boolean
+    mobile_address: String
+    pc_address: String
+
   }
 
   input AddUserInput {
