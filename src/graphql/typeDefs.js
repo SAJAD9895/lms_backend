@@ -5,7 +5,7 @@ const typeDefs = gql`
     id: Int!
     title: String!
     duration: String!
-    isPreview: Boolean
+    is_preview: Boolean 
     link: String
   }
 
