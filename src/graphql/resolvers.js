@@ -31,8 +31,27 @@ module.exports = {
         },
       }),
 
-    getUserEnrollments: (_, { userUid }) =>
-      prisma.enrollments.findMany({ where: { user_uid: userUid } }),
+  getUserEnrollments: async (_, { userUid }) => {
+  const enrollments = await prisma.enrollments.findMany({
+    where: { user_uid: userUid },
+    select: {
+      id: true,
+      user_uid: true,
+      course_id: true,
+      enrolled_at: true,
+    },
+  });
+
+  // Map to match GraphQL field names
+  return enrollments.map(e => ({
+    id: e.id,
+    userUid: e.user_uid,
+    courseId: e.course_id,
+    enrolledAt: e.enrolled_at.toISOString(), // convert Date to ISO string
+  }));
+}
+
+,
 
     getUser: (_, { uid }) =>
       prisma.users.findUnique({ where: { uid } }),
