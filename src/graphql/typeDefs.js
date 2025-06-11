@@ -36,6 +36,7 @@ const typeDefs = gql`
     userUid: String    
     courseId: Int      
     enrolledAt: String
+    course: Course
   }
 
 
